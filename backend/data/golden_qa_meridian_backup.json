@@ -1,0 +1,212 @@
+[
+  {
+    "id": "lookup-01",
+    "question": "Which HTTP header is used to authenticate server-to-server API requests?",
+    "expected_answer": "The X-Meridian-Key request header carries the API key.",
+    "answer_type": "lookup",
+    "expected_sources": ["api-authentication.md"]
+  },
+  {
+    "id": "lookup-02",
+    "question": "How often must API keys be rotated, and how long is the rotation grace period?",
+    "expected_answer": "Keys must be rotated every 90 days; after rotation the old key remains valid for a 72-hour grace period.",
+    "answer_type": "lookup",
+    "expected_sources": ["api-authentication.md"]
+  },
+  {
+    "id": "lookup-03",
+    "question": "What is the rate limit for Enterprise plan API keys?",
+    "expected_answer": "Enterprise keys allow 1200 requests per minute with a burst of 1800, enforced per key with a sliding window.",
+    "answer_type": "lookup",
+    "expected_sources": ["api-authentication.md"]
+  },
+  {
+    "id": "lookup-04",
+    "question": "What command rolls back a service to a previous release?",
+    "expected_answer": "shipctl rollback <service> --to <release-id>; release IDs come from shipctl releases <service> --limit 10.",
+    "answer_type": "lookup",
+    "expected_sources": ["deployment-guide.md"]
+  },
+  {
+    "id": "lookup-05",
+    "question": "At what times does the production release train depart, and on which days?",
+    "expected_answer": "Twice a day at 10:00 and 16:00 UTC, Monday through Thursday. There is no Friday release train.",
+    "answer_type": "lookup",
+    "expected_sources": ["deployment-guide.md"]
+  },
+  {
+    "id": "lookup-06",
+    "question": "Within how many business days must a SEV1 postmortem be published?",
+    "expected_answer": "Within 5 business days of resolution.",
+    "answer_type": "lookup",
+    "expected_sources": ["incident-response.md"]
+  },
+  {
+    "id": "lookup-07",
+    "question": "What is the minimum line coverage required by the CI coverage gate?",
+    "expected_answer": "80% line coverage per package; PRs that drop a package below 80% fail the gate.",
+    "answer_type": "lookup",
+    "expected_sources": ["engineering-handbook.md"]
+  },
+  {
+    "id": "lookup-08",
+    "question": "How long are application logs retained, and in what system?",
+    "expected_answer": "Application logs are retained for 90 days in Loki.",
+    "answer_type": "lookup",
+    "expected_sources": ["data-retention-policy.md"]
+  },
+  {
+    "id": "lookup-09",
+    "question": "What command bootstraps a new engineer's workstation?",
+    "expected_answer": "curl -fsSL https://get.meridian.dev/bootstrap | bash — it installs shipctl, the meridian CLI, pinned runtimes, and VPN profiles, and is idempotent.",
+    "answer_type": "lookup",
+    "expected_sources": ["onboarding-guide.md"]
+  },
+  {
+    "id": "lookup-10",
+    "question": "What percentage of traffic does a production canary start at, and for how long?",
+    "expected_answer": "Canaries start at 5% of traffic for 20 minutes before ramping.",
+    "answer_type": "lookup",
+    "expected_sources": ["deployment-guide.md"]
+  },
+  {
+    "id": "multihop-01",
+    "question": "During a SEV1 caused by a bad deploy, who is allowed to deploy directly to production, and what happens to the release train for that service afterward?",
+    "expected_answer": "Incident commanders may deploy directly to production during a declared SEV1. A rollback pins the service, blocking its next two release trains until an engineer runs shipctl unpin.",
+    "answer_type": "multi_hop",
+    "expected_sources": ["incident-response.md", "deployment-guide.md"]
+  },
+  {
+    "id": "multihop-02",
+    "question": "If erased personal data existed in a database backup, how long until it is gone from backup media entirely, and why can't a restore bring it back?",
+    "expected_answer": "Backups expire after 35 days, so erased data ages out within that window. Restores replay deletion tombstones after restoring, so erased records cannot be resurrected.",
+    "answer_type": "multi_hop",
+    "expected_sources": ["data-retention-policy.md"]
+  },
+  {
+    "id": "multihop-03",
+    "question": "A new engineer wants to ship their first production change in week 2. What labels and gates must their PR clear before it can ride the release train?",
+    "expected_answer": "The PR needs an approving code-owner review with no unresolved blocking comments, green CI (unit, integration, lint, and the 80% coverage gate), a release-note label, and 60 minutes of staging soak before boarding the train.",
+    "answer_type": "multi_hop",
+    "expected_sources": ["onboarding-guide.md", "engineering-handbook.md", "deployment-guide.md"]
+  },
+  {
+    "id": "multihop-04",
+    "question": "How do the retention periods for audit logs and application logs differ, and which rule wins if both could apply to a record?",
+    "expected_answer": "Audit logs are kept 7 years (legal requirement, immutable S3); application logs 90 days in Loki. The shorter period wins unless the longer one is a legal requirement — so audit retention prevails for audit data.",
+    "answer_type": "multi_hop",
+    "expected_sources": ["data-retention-policy.md"]
+  },
+  {
+    "id": "multihop-05",
+    "question": "If a deploy regresses p99 latency during canary analysis, what happens automatically, and what must the team publish if the regression already caused a SEV2?",
+    "expected_answer": "The canary controller aborts and rolls back automatically on a >2 standard deviation regression. If a SEV2 was declared, the team must publish a blameless postmortem within 5 business days.",
+    "answer_type": "multi_hop",
+    "expected_sources": ["deployment-guide.md", "incident-response.md"]
+  },
+  {
+    "id": "multihop-06",
+    "question": "Why are rollbacks unsafe after the contract step of a database migration, and what sign-off does the contract step require?",
+    "expected_answer": "The contract step removes the old code path and is the point of no return — migrations are not rolled back automatically. It requires the migration-review label and sign-off from the data platform team.",
+    "answer_type": "multi_hop",
+    "expected_sources": ["engineering-handbook.md", "deployment-guide.md"]
+  },
+  {
+    "id": "multihop-07",
+    "question": "A new hire hasn't finished security training 30 days after starting. What happens to their access, and through what system would they request it back?",
+    "expected_answer": "Production namespace access is automatically revoked when training is overdue. Access requests go through the Okta access catalog, the only approved path.",
+    "answer_type": "multi_hop",
+    "expected_sources": ["onboarding-guide.md"]
+  },
+  {
+    "id": "multihop-08",
+    "question": "Where are authentication failures recorded, and how long is that record kept?",
+    "expected_answer": "Authentication failures go to the project audit log; audit logs are retained for 7 years in an immutable S3 bucket.",
+    "answer_type": "multi_hop",
+    "expected_sources": ["api-authentication.md", "data-retention-policy.md"]
+  },
+  {
+    "id": "unanswerable-01",
+    "question": "What is Meridian's annual revenue?",
+    "expected_answer": "I don't have enough information in the indexed documents to answer this question.",
+    "answer_type": "unanswerable",
+    "expected_sources": []
+  },
+  {
+    "id": "unanswerable-02",
+    "question": "Which cloud provider regions does Meridian deploy to?",
+    "expected_answer": "I don't have enough information in the indexed documents to answer this question.",
+    "answer_type": "unanswerable",
+    "expected_sources": []
+  },
+  {
+    "id": "unanswerable-03",
+    "question": "What is the salary band for a senior engineer at Meridian?",
+    "expected_answer": "I don't have enough information in the indexed documents to answer this question.",
+    "answer_type": "unanswerable",
+    "expected_sources": []
+  },
+  {
+    "id": "unanswerable-04",
+    "question": "How many employees does Meridian have?",
+    "expected_answer": "I don't have enough information in the indexed documents to answer this question.",
+    "answer_type": "unanswerable",
+    "expected_sources": []
+  },
+  {
+    "id": "unanswerable-05",
+    "question": "What programming language is the erasure-runner service written in?",
+    "expected_answer": "I don't have enough information in the indexed documents to answer this question.",
+    "answer_type": "unanswerable",
+    "expected_sources": []
+  },
+  {
+    "id": "unanswerable-06",
+    "question": "What is the on-call compensation bonus in dollars?",
+    "expected_answer": "I don't have enough information in the indexed documents to answer this question.",
+    "answer_type": "unanswerable",
+    "expected_sources": []
+  },
+  {
+    "id": "ambiguous-01",
+    "question": "How long do keys last?",
+    "expected_answer": "Depends on the key type: API keys must be rotated every 90 days with a 72-hour grace period; OAuth access tokens last 60 minutes and refresh tokens 30 days.",
+    "answer_type": "ambiguous",
+    "expected_sources": ["api-authentication.md"]
+  },
+  {
+    "id": "ambiguous-02",
+    "question": "What happens after 30 days?",
+    "expected_answer": "Several 30-day rules exist: GDPR deletion must complete within 30 calendar days, customer uploads are deleted 30 days after account closure, feature flags 30 days past expiry get cleanup PRs, CI artifacts expire after 30 days, and overdue security training (due within 30 days) revokes production access. A good answer asks for clarification or enumerates the relevant rules.",
+    "answer_type": "ambiguous",
+    "expected_sources": ["data-retention-policy.md", "engineering-handbook.md", "onboarding-guide.md"]
+  },
+  {
+    "id": "ambiguous-03",
+    "question": "Who approves exceptions?",
+    "expected_answer": "Depends on the exception: freeze-window deploy exceptions need a director; data retention exceptions need the Data Protection Officer in writing; admin:billing scope needs org-owner approval.",
+    "answer_type": "ambiguous",
+    "expected_sources": ["deployment-guide.md", "data-retention-policy.md", "api-authentication.md"]
+  },
+  {
+    "id": "ambiguous-04",
+    "question": "How fast do I need to respond?",
+    "expected_answer": "Depends on context: pages must be acknowledged within 5 minutes, code reviews within 24 business hours, SEV1 status-page updates within 15 minutes, webhook endpoints within 10 seconds, and Slack within the same business day.",
+    "answer_type": "ambiguous",
+    "expected_sources": ["incident-response.md", "engineering-handbook.md", "api-authentication.md", "onboarding-guide.md"]
+  },
+  {
+    "id": "ambiguous-05",
+    "question": "What gets deleted automatically?",
+    "expected_answer": "Multiple things: data past its retention TTL (enforced by storage TTLs and the retention-auditor), quarantined flaky tests after 14 days, ephemeral CI environments after 4 hours, and customer uploads 30 days after account closure.",
+    "answer_type": "ambiguous",
+    "expected_sources": ["data-retention-policy.md", "engineering-handbook.md"]
+  },
+  {
+    "id": "ambiguous-06",
+    "question": "When is direct production access allowed?",
+    "expected_answer": "Depends on the kind of access: direct production deploys are allowed only for incident commanders during a declared SEV1; break-glass production access requires a declared incident, is audited and recorded, and expires after 4 hours.",
+    "answer_type": "ambiguous",
+    "expected_sources": ["deployment-guide.md", "engineering-handbook.md", "incident-response.md"]
+  }
+]

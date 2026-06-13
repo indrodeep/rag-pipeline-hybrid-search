@@ -1,0 +1,13 @@
+fastapi==0.115.12
+uvicorn[standard]==0.34.0
+pydantic==2.10.6
+pydantic-settings==2.8.1
+python-multipart==0.0.20
+openai==1.75.0
+chromadb==0.6.3
+rank-bm25==0.2.2
+langchain-text-splitters==0.3.7
+PyMuPDF==1.25.5
+beautifulsoup4==4.13.3
+numpy>=1.26
+python-json-logger==3.3.0

@@ -1,0 +1,15 @@
+# Never bake the local virtualenv or caches into the image
+.venv/
+__pycache__/
+*.pyc
+.mypy_cache/
+
+# Secrets are injected at runtime via docker-compose env_file, not baked in
+.env
+
+# Regenerable / persisted index data comes from the mounted volume at runtime
+data/chroma/
+data/bm25/
+data/documents/
+data/query_log.json
+data/eval_runs.json

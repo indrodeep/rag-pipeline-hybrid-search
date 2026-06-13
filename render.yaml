@@ -1,0 +1,65 @@
+# Render Blueprint — deploys the whole Verity demo from this repo in one shot.
+#
+#   1. Push this repo to GitHub.
+#   2. In Render:  New ▸ Blueprint  →  pick this repo  →  Apply.
+#   3. On the backend service, set the one secret that is NOT in git:
+#        OPENAI_API_KEY = sk-...
+#   4. (Recommended) In OpenAI's dashboard, set a hard monthly billing cap as
+#      the ultimate backstop — see README ▸ "Capping the spend".
+#
+# Free plan notes:
+#   - The backend sleeps after ~15 min idle and cold-starts on the next request
+#     (first answer is slow). It re-seeds the bundled sample corpus on each cold
+#     start, so the demo always works; uploaded docs are not persisted (uploads
+#     are admin-only anyway). For persistence, move the backend to a paid plan
+#     and attach a disk at /app/data (see the commented block below).
+
+services:
+  # ---- Backend: FastAPI + uvicorn ----
+  - type: web
+    name: verity-rag-backend
+    runtime: docker
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false                 # ← set in the Render dashboard; never in git
+      - key: ADMIN_API_KEY
+        generateValue: true         # random secret; send as X-Admin-Key to unlock upload/eval
+      - key: PUBLIC_DEMO_MODE
+        value: "true"               # rate-limit /ask, lock upload + eval to the admin key
+      - key: RATE_LIMIT_PER_IP_DAILY
+        value: "20"
+      - key: RATE_LIMIT_GLOBAL_DAILY
+        value: "300"                # hard daily kill-switch across all visitors
+      - key: CORS_ORIGINS
+        value: "*"                  # public read-only demo API; tighten if you add auth
+    # Persistence requires a paid instance — uncomment to keep indexes/uploads
+    # across restarts:
+    # disk:
+    #   name: verity-data
+    #   mountPath: /app/data
+    #   sizeGB: 1
+
+  # ---- Frontend: static Vite build, served from a CDN ----
+  - type: web
+    name: verity-rag-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: ./dist
+    autoDeploy: true
+    envVars:
+      # Baked into the build. After the first deploy, confirm this matches the
+      # backend's real URL (Render appends a suffix if the name was taken) and
+      # redeploy the frontend if it differs.
+      - key: VITE_API_BASE
+        value: https://verity-rag-backend.onrender.com
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
