@@ -25,3 +25,4 @@ frontend/dist/
 
 # Local editor / Claude Code machine-specific settings
 .claude/settings.local.json
+.file/
